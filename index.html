@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asterisc Technocrat — Internship Form</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div class="form-wrap">
+  <div class="form-card">
+
+    <div class="form-header">
+      <div class="badge">Internship Program</div>
+      <h1 class="form-title">Asterisc <span>Technocrat</span></h1>
+      <p class="form-subtitle">Internship Joining Form — Fill details carefully</p>
+    </div>
+
+    <div class="form-body">
+
+      <div class="field-group">
+        <label class="field-label">Full Name <span class="req">*</span></label>
+        <div class="three-col">
+          <div class="field-sub">
+            <input id="f_first_name" type="text" class="field-input" placeholder="First Name" />
+            <span class="sub-label">First</span>
+          </div>
+          <div class="field-sub">
+            <input id="f_middle_name" type="text" class="field-input" placeholder="Middle Name" />
+            <span class="sub-label">Middle</span>
+          </div>
+          <div class="field-sub">
+            <input id="f_last_name" type="text" class="field-input" placeholder="Last Name" />
+            <span class="sub-label">Last</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="field-group">
+          <label class="field-label">Email <span class="req">*</span></label>
+          <input id="f_email" type="email" class="field-input" placeholder="email@example.com" />
+        </div>
+        <div class="field-group">
+          <label class="field-label">Phone No. <span class="req">*</span></label>
+          <input id="f_phone" type="tel" class="field-input" placeholder="10-digit number" maxlength="10" />
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Position / Role <span class="req">*</span></label>
+        <input id="f_position" type="text" class="field-input" placeholder="e.g. Web Developer, UI/UX Designer" />
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Duration <span class="req">*</span></label>
+        <div class="radio-group">
+          <label class="radio-option">
+            <input type="radio" name="duration" value="1 Month">
+            <span class="radio-label">1 Month</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="duration" value="3 Months">
+            <span class="radio-label">3 Months</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="duration" value="6 Months">
+            <span class="radio-label">6 Months</span>
+          </label>
+          <label class="radio-option">
+            <input type="radio" name="duration" value="1 Year">
+            <span class="radio-label">1 Year</span>
+          </label>
+        </div>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">Joining Date <span class="req">*</span></label>
+        <input id="f_joining" type="date" class="field-input" />
+      </div>
+
+      <hr class="divider" />
+
+      <div class="field-group">
+        <label class="field-label">Updated CV</label>
+        <label class="file-zone">
+          <input type="file" id="f_cv" accept=".pdf,.doc,.docx" />
+          <div class="file-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a08cff" stroke-width="2">
+              <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </div>
+          <div class="file-text">
+            <strong id="cv_name">No file chosen</strong>
+            Upload CV (.pdf, .doc, .docx — max 10MB)
+          </div>
+        </label>
+      </div>
+
+      <div class="field-group">
+        <label class="field-label">College Permission Letter</label>
+        <label class="file-zone">
+          <input type="file" id="f_letter" accept=".pdf,.doc,.docx,.jpg,.png" />
+          <div class="file-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="#a08cff" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="3"/>
+              <path d="M8 12h8M8 8h8M8 16h5"/>
+            </svg>
+          </div>
+          <div class="file-text">
+            <strong id="letter_name">No file chosen</strong>
+            Upload Permission Letter (max 10MB)
+          </div>
+        </label>
+      </div>
+
+      <hr class="divider" />
+
+      <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">Submit Application</button>
+      <div class="status-msg" id="statusMsg"></div>
+      <p class="note-text">Your data will be saved securely to Asterisc's system.</p>
+
+    </div>
+  </div>
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
