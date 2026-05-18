@@ -7,6 +7,17 @@ const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-JPMOOd40LJ4cHDl2F
 //  DOM READY — listeners tab lagao jab page load ho
 // =============================================
 window.addEventListener('DOMContentLoaded', function () {
+  // Inject SVG gradient for spinner
+  const svgNS = 'http://www.w3.org/2000/svg';
+  const defs = document.createElementNS(svgNS, 'defs');
+  defs.innerHTML = `
+    <linearGradient id="spinGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#6a3cff"/>
+      <stop offset="100%" stop-color="#ff507a"/>
+    </linearGradient>
+  `;
+  document.querySelector('.loader-ring svg').prepend(defs);
+
   document.getElementById('f_cv').addEventListener('change', function () {
     document.getElementById('cv_name').textContent =
       this.files[0] ? this.files[0].name : 'No file chosen';
@@ -19,6 +30,28 @@ window.addEventListener('DOMContentLoaded', function () {
 });
 
 // =============================================
+//  LOADING OVERLAY HELPERS
+// =============================================
+function showLoading(msg) {
+  const overlay = document.getElementById('loadingOverlay');
+  document.getElementById('loadingSubText').textContent = msg || 'Uploading your details…';
+  overlay.classList.add('active');
+}
+
+function hideLoading() {
+  document.getElementById('loadingOverlay').classList.remove('active');
+}
+
+function updateLoadingMsg(msg) {
+  const el = document.getElementById('loadingSubText');
+  el.style.opacity = '0';
+  setTimeout(() => {
+    el.textContent = msg;
+    el.style.opacity = '1';
+  }, 200);
+}
+
+// =============================================
 //  FORM RESET
 // =============================================
 function resetForm() {
@@ -28,6 +61,39 @@ function resetForm() {
   document.getElementById('f_letter').value = '';
   document.getElementById('cv_name').textContent = 'No file chosen';
   document.getElementById('letter_name').textContent = 'No file chosen';
+}
+
+// =============================================
+//  THANK YOU PAGE
+// =============================================
+function showThankYou(firstName, position, duration, joiningDate) {
+  // Set name
+  document.getElementById('ty_name').textContent = firstName || 'Candidate';
+
+  // Build detail chips
+  const details = document.getElementById('ty_details');
+  details.innerHTML = '';
+  const chips = [];
+  if (position)    chips.push({ label: position });
+  if (duration)    chips.push({ label: duration });
+  if (joiningDate) chips.push({ label: 'Joining: ' + formatDate(joiningDate) });
+
+  chips.forEach(c => {
+    const chip = document.createElement('div');
+    chip.className = 'ty-chip';
+    chip.innerHTML = `<div class="ty-chip-dot"></div>${c.label}`;
+    details.appendChild(chip);
+  });
+
+  // Show the page
+  const page = document.getElementById('thankyouPage');
+  page.classList.add('visible');
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
 // =============================================
@@ -75,10 +141,9 @@ async function handleSubmit() {
 
   btn.disabled = true;
   btn.textContent = 'Submitting...';
+  showLoading('Preparing your application…');
 
   try {
-    // ✅ CORS FIX: FormData use karo — JSON + Content-Type header
-    // se CORS block hota hai, FormData se nahi
     const formData = new FormData();
     formData.append('first_name',  firstName);
     formData.append('middle_name', middleName);
@@ -93,6 +158,7 @@ async function handleSubmit() {
 
     if (cvFile) {
       if (cvFile.size > 10 * 1024 * 1024) throw new Error('CV file 10MB se badi hai.');
+      updateLoadingMsg('Uploading CV…');
       formData.append('cv_base64',   await fileToBase64(cvFile));
       formData.append('cv_filename', cvFile.name);
       formData.append('cv_mimetype', cvFile.type);
@@ -100,25 +166,29 @@ async function handleSubmit() {
 
     if (letterFile) {
       if (letterFile.size > 10 * 1024 * 1024) throw new Error('Permission letter 10MB se badi hai.');
+      updateLoadingMsg('Uploading permission letter…');
       formData.append('letter_base64',   await fileToBase64(letterFile));
       formData.append('letter_filename', letterFile.name);
       formData.append('letter_mimetype', letterFile.type);
     }
 
-    // ✅ no-cors mode — Apps Script redirect ko handle karta hai
+    updateLoadingMsg('Sending to Asterisc servers…');
+
     await fetch(SCRIPT_URL, {
       method: 'POST',
       body: formData,
-      mode: 'no-cors'   // ← CORS error band, response opaque aayega
+      mode: 'no-cors'
     });
 
-    // no-cors mein response body nahi milta — fetch throw nahi
-    // kiya matlab data chala gaya
-    statusEl.className = 'status-msg success';
-    statusEl.textContent = '✅ Application submitted! You will receive a confirmation soon.';
+    updateLoadingMsg('Almost done…');
+    await new Promise(r => setTimeout(r, 600));
+
+    hideLoading();
+    showThankYou(firstName, position, duration.value, joining);
     resetForm();
 
   } catch (e) {
+    hideLoading();
     statusEl.className = 'status-msg error';
     statusEl.textContent = '❌ Submission failed: ' + e.message;
   }
