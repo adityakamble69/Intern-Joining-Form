@@ -1,7 +1,7 @@
 // =============================================
 //  CONFIG — Google Apps Script URL
 // =============================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz-JPMOOd40LJ4cHDl2FF7b2i8s0oM5K-mWEnXQz_KAh2C5dVqXrYuhJzoMi0HGyCya/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyre3WRylngGgsaSbyJbolJbb2902-J9BxBYdVnxkjJ-QPsEGAkyS4kHXOISZXkqRo/exec';
 
 // =============================================
 //  DOM READY — listeners tab lagao jab page load ho
@@ -67,10 +67,8 @@ function resetForm() {
 //  THANK YOU PAGE
 // =============================================
 function showThankYou(firstName, position, duration, joiningDate) {
-  // Set name
   document.getElementById('ty_name').textContent = firstName || 'Candidate';
 
-  // Build detail chips
   const details = document.getElementById('ty_details');
   details.innerHTML = '';
   const chips = [];
@@ -85,7 +83,6 @@ function showThankYou(firstName, position, duration, joiningDate) {
     details.appendChild(chip);
   });
 
-  // Show the page
   const page = document.getElementById('thankyouPage');
   page.classList.add('visible');
 }
@@ -115,27 +112,34 @@ async function handleSubmit() {
   const firstName  = document.getElementById('f_first_name').value.trim();
   const middleName = document.getElementById('f_middle_name').value.trim();
   const lastName   = document.getElementById('f_last_name').value.trim();
-  const name       = [firstName, middleName, lastName].filter(Boolean).join(' ');
-  const email    = document.getElementById('f_email').value.trim();
-  const phone    = document.getElementById('f_phone').value.trim();
-  const position = document.getElementById('f_position').value.trim();
-  const duration = document.querySelector('input[name="duration"]:checked');
-  const joining  = document.getElementById('f_joining').value;
-  const statusEl = document.getElementById('statusMsg');
-  const btn      = document.getElementById('submitBtn');
+  const email      = document.getElementById('f_email').value.trim();
+  const phone      = document.getElementById('f_phone').value.trim();
+  const position   = document.getElementById('f_position').value.trim();  // ✅ position read
+  const duration   = document.querySelector('input[name="duration"]:checked');
+  const joining    = document.getElementById('f_joining').value;
+  const statusEl   = document.getElementById('statusMsg');
+  const btn        = document.getElementById('submitBtn');
 
   statusEl.className = 'status-msg';
   statusEl.style.display = 'none';
 
-  // Validation
-  if (!firstName || !lastName || !email || !phone || !duration || !joining) {
+  // ── Validation ──────────────────────────────────────────
+  if (!firstName || !lastName || !email || !phone || !position || !duration || !joining) {
     statusEl.className = 'status-msg error';
-    statusEl.textContent = 'Please fill all required fields before submitting.';
+    statusEl.style.display = 'block';
+    statusEl.textContent = '⚠️ Please fill all required fields before submitting.';
     return;
   }
   if (!/^\d{10}$/.test(phone)) {
     statusEl.className = 'status-msg error';
-    statusEl.textContent = 'Phone number must be exactly 10 digits.';
+    statusEl.style.display = 'block';
+    statusEl.textContent = '⚠️ Phone number must be exactly 10 digits.';
+    return;
+  }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    statusEl.className = 'status-msg error';
+    statusEl.style.display = 'block';
+    statusEl.textContent = '⚠️ Please enter a valid email address.';
     return;
   }
 
@@ -145,12 +149,13 @@ async function handleSubmit() {
 
   try {
     const formData = new FormData();
-    formData.append('first_name',  firstName);
-    formData.append('middle_name', middleName);
-    formData.append('last_name',   lastName);
-    formData.append('email',       email);
-    formData.append('phone',       phone);
-    formData.append('duration',    duration.value);
+    formData.append('first_name',   firstName);
+    formData.append('middle_name',  middleName);
+    formData.append('last_name',    lastName);
+    formData.append('email',        email);
+    formData.append('phone',        phone);
+    formData.append('position',     position);   // ✅ position append — email mein jaayega
+    formData.append('duration',     duration.value);
     formData.append('joining_date', joining);
 
     const cvFile     = document.getElementById('f_cv').files[0];
@@ -190,6 +195,7 @@ async function handleSubmit() {
   } catch (e) {
     hideLoading();
     statusEl.className = 'status-msg error';
+    statusEl.style.display = 'block';
     statusEl.textContent = '❌ Submission failed: ' + e.message;
   }
 
