@@ -1,7 +1,7 @@
 // =============================================
 //  CONFIG — Google Apps Script URL
 // =============================================
-const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyre3WRylngGgsaSbyJbolJbb2902-J9BxBYdVnxkjJ-QPsEGAkyS4kHXOISZXkqRo/exec';
+const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyxi6rsfNf23AZfSOdeEx2aDaF4VjOL1IT7yoJ5PjPLc1nrvf-RKs9SuOu7VA16FTLr/exec';
 
 // =============================================
 //  DOM READY — listeners tab lagao jab page load ho
@@ -66,13 +66,14 @@ function resetForm() {
 // =============================================
 //  THANK YOU PAGE
 // =============================================
-function showThankYou(firstName, position, duration, joiningDate) {
+function showThankYou(firstName, position, college, duration, joiningDate) {
   document.getElementById('ty_name').textContent = firstName || 'Candidate';
 
   const details = document.getElementById('ty_details');
   details.innerHTML = '';
   const chips = [];
   if (position)    chips.push({ label: position });
+  if (college)     chips.push({ label: college });
   if (duration)    chips.push({ label: duration });
   if (joiningDate) chips.push({ label: 'Joining: ' + formatDate(joiningDate) });
 
@@ -115,6 +116,7 @@ async function handleSubmit() {
   const email      = document.getElementById('f_email').value.trim();
   const phone      = document.getElementById('f_phone').value.trim();
   const position   = document.getElementById('f_position').value.trim();  // ✅ position read
+  const college    = document.getElementById('f_college').value.trim();    // ✅ college read
   const duration   = document.querySelector('input[name="duration"]:checked');
   const joining    = document.getElementById('f_joining').value;
   const statusEl   = document.getElementById('statusMsg');
@@ -124,7 +126,7 @@ async function handleSubmit() {
   statusEl.style.display = 'none';
 
   // ── Validation ──────────────────────────────────────────
-  if (!firstName || !lastName || !email || !phone || !position || !duration || !joining) {
+  if (!firstName || !lastName || !email || !phone || !position || !college || !duration || !joining) {
     statusEl.className = 'status-msg error';
     statusEl.style.display = 'block';
     statusEl.textContent = '⚠️ Please fill all required fields before submitting.';
@@ -155,6 +157,7 @@ async function handleSubmit() {
     formData.append('email',        email);
     formData.append('phone',        phone);
     formData.append('position',     position);   // ✅ position append — email mein jaayega
+    formData.append('college',      college);    // ✅ college append — sheet mein save hoga
     formData.append('duration',     duration.value);
     formData.append('joining_date', joining);
 
@@ -189,7 +192,7 @@ async function handleSubmit() {
     await new Promise(r => setTimeout(r, 600));
 
     hideLoading();
-    showThankYou(firstName, position, duration.value, joining);
+    showThankYou(firstName, position, college, duration.value, joining);
     resetForm();
 
   } catch (e) {
